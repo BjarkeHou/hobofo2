@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 05, 2017 at 02:10 PM
+-- Generation Time: Nov 05, 2017 at 03:26 PM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.30
 
@@ -21,6 +21,18 @@ SET time_zone = "+00:00";
 --
 -- Database: `hobofo2`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `currentratings`
+-- (See below for the actual view)
+--
+CREATE TABLE `currentratings` (
+`id` int(11)
+,`name` varchar(11)
+,`rating` decimal(32,0)
+);
 
 -- --------------------------------------------------------
 
@@ -49,6 +61,13 @@ CREATE TABLE `Groups` (
   `group_number` int(11) NOT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Groups`
+--
+
+INSERT INTO `Groups` (`id`, `tournament_id`, `group_number`, `created`) VALUES
+(1, 1, 1, '2017-11-05 15:39:19');
 
 -- --------------------------------------------------------
 
@@ -116,11 +135,25 @@ CREATE TABLE `Players` (
   `phone` varchar(11) NOT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `active_membership` tinyint(1) NOT NULL DEFAULT '0',
-  `last_paid_membership` datetime NOT NULL,
-  `rating` int(11) NOT NULL,
+  `last_paid_membership` datetime DEFAULT NULL,
+  `rating` int(11) NOT NULL DEFAULT '0',
   `elo` int(11) NOT NULL DEFAULT '1200',
   `receive_sms` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Players`
+--
+
+INSERT INTO `Players` (`id`, `name`, `phone`, `created`, `active_membership`, `last_paid_membership`, `rating`, `elo`, `receive_sms`) VALUES
+(1, 'a', '1', '2017-11-05 15:37:44', 0, NULL, 0, 1200, 1),
+(2, 'b', '2', '2017-11-05 15:37:44', 0, NULL, 0, 1200, 1),
+(3, 'c', '3', '2017-11-05 15:37:54', 0, NULL, 0, 1200, 1),
+(4, 'd', '4', '2017-11-05 15:37:54', 0, NULL, 0, 1200, 1),
+(5, 'e', '5', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
+(6, 'f', '6', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
+(7, 'g', '7', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1),
+(8, 'h', '8', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1);
 
 -- --------------------------------------------------------
 
@@ -136,6 +169,15 @@ CREATE TABLE `RatingChanges` (
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `RatingChanges`
+--
+
+INSERT INTO `RatingChanges` (`id`, `tournament_id`, `player_id`, `rating_change`, `created`) VALUES
+(1, 1, 1, 1200, '2017-11-05 15:40:34'),
+(2, 1, 1, 1200, '2017-09-01 00:00:00'),
+(3, 1, 2, 20, '2017-11-05 15:51:28');
+
 -- --------------------------------------------------------
 
 --
@@ -146,6 +188,15 @@ CREATE TABLE `Roles` (
   `id` int(11) NOT NULL,
   `name` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Roles`
+--
+
+INSERT INTO `Roles` (`id`, `name`) VALUES
+(1, 'admin'),
+(2, 'Competent'),
+(3, 'Barvagt');
 
 -- --------------------------------------------------------
 
@@ -175,6 +226,13 @@ CREATE TABLE `Tournaments` (
   `ended` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `Tournaments`
+--
+
+INSERT INTO `Tournaments` (`id`, `created`, `started`, `ended`) VALUES
+(1, '2017-11-05 15:39:01', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -187,6 +245,15 @@ CREATE TABLE `Users` (
   `password` varchar(1) NOT NULL,
   `role_id` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `currentratings`
+--
+DROP TABLE IF EXISTS `currentratings`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `currentratings`  AS  select `players`.`id` AS `id`,`players`.`name` AS `name`,sum(`ratingchanges`.`rating_change`) AS `rating` from (`players` left join `ratingchanges` on((`players`.`id` = `ratingchanges`.`player_id`))) where (`ratingchanges`.`created` >= (curdate() - interval 8 week)) group by `players`.`id` order by `rating` desc ;
 
 --
 -- Indexes for dumped tables
@@ -272,7 +339,7 @@ ALTER TABLE `EloChanges`
 -- AUTO_INCREMENT for table `Groups`
 --
 ALTER TABLE `Groups`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Matches`
@@ -296,19 +363,19 @@ ALTER TABLE `Memberships`
 -- AUTO_INCREMENT for table `Players`
 --
 ALTER TABLE `Players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `RatingChanges`
 --
 ALTER TABLE `RatingChanges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `Roles`
 --
 ALTER TABLE `Roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `Teams`
@@ -320,7 +387,7 @@ ALTER TABLE `Teams`
 -- AUTO_INCREMENT for table `Tournaments`
 --
 ALTER TABLE `Tournaments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Users`
