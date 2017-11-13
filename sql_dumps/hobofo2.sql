@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 05, 2017 at 03:26 PM
+-- Generation Time: Nov 07, 2017 at 10:07 AM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.30
 
@@ -22,13 +22,95 @@ SET time_zone = "+00:00";
 -- Database: `hobofo2`
 --
 
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `calc_elo` (IN `match_id` INT(11))  NO SQL
+BEGIN
+DECLARE t1 INT;
+DECLARE t2 INT;
+DECLARE winner INT;
+DECLARE k INT;
+DECLARE eloChange INT;
+DECLARE t1elo INT;
+DECLARE t2elo INT;
+DECLARE R1 DOUBLE;
+DECLARE R2 DOUBLE;
+DECLARE E1 DOUBLE;
+DECLARE E2 DOUBLE;
+
+SELECT Matches.team1_id, Matches.team2_id, Matches.winner_id, Matchtypes.k
+INTO t1, t2, winner, k
+FROM Matches 
+INNER JOIN Matchtypes ON Matches.matchtype_id = Matchtypes.id
+WHERE Matches.id = match_id;
+
+CALL get_team_elo(t1, t1elo);
+CALL get_team_elo(t2, t2elo);
+
+SET R1 = POW(10, (t1elo / 400));
+SET R2 = POW(10, (t2elo / 400));
+
+SET E1 = R1 / (R1 + R2);
+SET E2 = R2 / (R2 + R1);
+
+IF winner = t1 THEN
+	SET eloChange = k*(1-E1);
+
+	#Winners
+	INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player1_id, match_id, Teams.tournament_id, eloChange
+    FROM Teams WHERE Teams.id = t1;
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player2_id, match_id, Teams.tournament_id, eloChange
+    FROM Teams WHERE Teams.id = t1;
+    
+    #Loosers
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player1_id, match_id, Teams.tournament_id, -1 * eloChange
+    FROM Teams WHERE Teams.id = t2;
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player2_id, match_id, Teams.tournament_id, -1 * eloChange
+    FROM Teams WHERE Teams.id = t2;
+ELSEIF winner = t2 THEN
+	SET eloChange = k*(1-E2);
+
+	INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player1_id, match_id, Teams.tournament_id, eloChange
+    FROM Teams WHERE Teams.id = t2;
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player2_id, match_id, Teams.tournament_id, eloChange
+    FROM Teams WHERE Teams.id = t2;
+    
+    #Loosers
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player1_id, match_id, Teams.tournament_id, -1 * eloChange
+    FROM Teams WHERE Teams.id = t1;
+    INSERT INTO elo_changes (player_id, match_id, tournament_id, elo_change)
+    SELECT Teams.player2_id, match_id, Teams.tournament_id, -1 * eloChange
+    FROM Teams WHERE Teams.id = t1;
+END IF;
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_team_elo` (IN `team_id` INT(11), OUT `team_elo` INT(11))  NO SQL
+SELECT SUM(Players.elo)
+FROM Teams
+INNER JOIN Players ON Teams.player1_id = Players.id OR Teams.player2_id = Players.id
+WHERE Teams.id = team_id
+INTO team_elo$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `currentratings`
+-- Stand-in structure for view `current_rating`
 -- (See below for the actual view)
 --
-CREATE TABLE `currentratings` (
+CREATE TABLE `current_rating` (
 `id` int(11)
 ,`name` varchar(11)
 ,`rating` decimal(32,0)
@@ -37,10 +119,22 @@ CREATE TABLE `currentratings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `EloChanges`
+-- Stand-in structure for view `current_ratings`
+-- (See below for the actual view)
+--
+CREATE TABLE `current_ratings` (
+`id` int(11)
+,`name` varchar(11)
+,`rating` decimal(32,0)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `elo_changes`
 --
 
-CREATE TABLE `EloChanges` (
+CREATE TABLE `elo_changes` (
   `id` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
   `match_id` int(11) NOT NULL,
@@ -48,6 +142,34 @@ CREATE TABLE `EloChanges` (
   `elo_change` int(11) NOT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `elo_changes`
+--
+
+INSERT INTO `elo_changes` (`id`, `player_id`, `match_id`, `tournament_id`, `elo_change`, `created`) VALUES
+(2, 1, 1, 1, 23, '2017-11-06 22:06:44'),
+(3, 2, 1, 1, 23, '2017-11-06 22:06:44'),
+(4, 3, 1, 1, -23, '2017-11-06 22:06:44'),
+(5, 4, 1, 1, -23, '2017-11-06 22:06:44'),
+(6, 1, 1, 1, 23, '2017-11-06 22:12:46'),
+(7, 2, 1, 1, 23, '2017-11-06 22:12:46'),
+(8, 3, 1, 1, -23, '2017-11-06 22:12:46'),
+(9, 4, 1, 1, -23, '2017-11-06 22:12:46'),
+(10, 3, 1, 1, 2, '2017-11-06 22:15:43'),
+(11, 4, 1, 1, 2, '2017-11-06 22:15:43'),
+(12, 1, 1, 1, -2, '2017-11-06 22:15:43'),
+(13, 2, 1, 1, -2, '2017-11-06 22:15:43');
+
+--
+-- Triggers `elo_changes`
+--
+DELIMITER $$
+CREATE TRIGGER `elo_change_update_player` AFTER INSERT ON `elo_changes` FOR EACH ROW UPDATE Players
+SET Players.elo = Players.elo + NEW.elo_change
+WHERE Players.id = NEW.player_id
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -85,10 +207,18 @@ CREATE TABLE `Matches` (
   `team2_score` int(11) DEFAULT NULL,
   `winner_id` int(11) DEFAULT NULL,
   `matchtype_id` int(11) NOT NULL,
+  `table_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `started` datetime DEFAULT NULL,
   `ended` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Matches`
+--
+
+INSERT INTO `Matches` (`id`, `tournament_id`, `group_id`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `winner_id`, `matchtype_id`, `table_id`, `created`, `started`, `ended`) VALUES
+(1, 1, 1, 1, 2, 2, 7, 2, 1, 1, '2017-11-05 23:47:39', '2017-11-05 00:00:00', '2017-11-05 07:00:00');
 
 -- --------------------------------------------------------
 
@@ -98,18 +228,18 @@ CREATE TABLE `Matches` (
 
 CREATE TABLE `Matchtypes` (
   `id` int(11) NOT NULL,
-  `name` varchar(25) NOT NULL
+  `name` varchar(25) NOT NULL,
+  `k` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `Matchtypes`
 --
 
-INSERT INTO `Matchtypes` (`id`, `name`) VALUES
-(1, 'Group'),
-(2, 'Quarterfinal'),
-(3, 'Semifinal'),
-(4, 'Final');
+INSERT INTO `Matchtypes` (`id`, `name`, `k`) VALUES
+(1, 'FT7', 24),
+(2, 'BO3', 28),
+(3, 'BO5', 32);
 
 -- --------------------------------------------------------
 
@@ -146,10 +276,10 @@ CREATE TABLE `Players` (
 --
 
 INSERT INTO `Players` (`id`, `name`, `phone`, `created`, `active_membership`, `last_paid_membership`, `rating`, `elo`, `receive_sms`) VALUES
-(1, 'a', '1', '2017-11-05 15:37:44', 0, NULL, 0, 1200, 1),
-(2, 'b', '2', '2017-11-05 15:37:44', 0, NULL, 0, 1200, 1),
-(3, 'c', '3', '2017-11-05 15:37:54', 0, NULL, 0, 1200, 1),
-(4, 'd', '4', '2017-11-05 15:37:54', 0, NULL, 0, 1200, 1),
+(1, 'a', '1', '2017-11-05 15:37:44', 0, NULL, 0, 1221, 1),
+(2, 'b', '2', '2017-11-05 15:37:44', 0, NULL, 0, 1021, 1),
+(3, 'c', '3', '2017-11-05 15:37:54', 0, NULL, 0, 1379, 1),
+(4, 'd', '4', '2017-11-05 15:37:54', 0, NULL, 0, 1279, 1),
 (5, 'e', '5', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
 (6, 'f', '6', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
 (7, 'g', '7', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1),
@@ -158,10 +288,10 @@ INSERT INTO `Players` (`id`, `name`, `phone`, `created`, `active_membership`, `l
 -- --------------------------------------------------------
 
 --
--- Table structure for table `RatingChanges`
+-- Table structure for table `rating_changes`
 --
 
-CREATE TABLE `RatingChanges` (
+CREATE TABLE `rating_changes` (
   `id` int(11) NOT NULL,
   `tournament_id` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
@@ -170,10 +300,10 @@ CREATE TABLE `RatingChanges` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `RatingChanges`
+-- Dumping data for table `rating_changes`
 --
 
-INSERT INTO `RatingChanges` (`id`, `tournament_id`, `player_id`, `rating_change`, `created`) VALUES
+INSERT INTO `rating_changes` (`id`, `tournament_id`, `player_id`, `rating_change`, `created`) VALUES
 (1, 1, 1, 1200, '2017-11-05 15:40:34'),
 (2, 1, 1, 1200, '2017-09-01 00:00:00'),
 (3, 1, 2, 20, '2017-11-05 15:51:28');
@@ -201,6 +331,29 @@ INSERT INTO `Roles` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tables`
+--
+
+CREATE TABLE `tables` (
+  `id` int(11) NOT NULL,
+  `name` varchar(25) NOT NULL,
+  `occupied` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `tables`
+--
+
+INSERT INTO `tables` (`id`, `name`, `occupied`) VALUES
+(1, 'Bord 1', 0),
+(2, 'Bord 2', 0),
+(3, 'Bord 3', 0),
+(4, 'Bord 4', 0),
+(5, 'Bord 5', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Teams`
 --
 
@@ -212,6 +365,14 @@ CREATE TABLE `Teams` (
   `player2_id` int(11) NOT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Teams`
+--
+
+INSERT INTO `Teams` (`id`, `tournament_id`, `group_id`, `player1_id`, `player2_id`, `created`) VALUES
+(1, 1, 1, 1, 2, '2017-11-05 20:52:40'),
+(2, 1, 1, 3, 4, '2017-11-05 20:52:40');
 
 -- --------------------------------------------------------
 
@@ -249,20 +410,29 @@ CREATE TABLE `Users` (
 -- --------------------------------------------------------
 
 --
--- Structure for view `currentratings`
+-- Structure for view `current_rating`
 --
-DROP TABLE IF EXISTS `currentratings`;
+DROP TABLE IF EXISTS `current_rating`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `currentratings`  AS  select `players`.`id` AS `id`,`players`.`name` AS `name`,sum(`ratingchanges`.`rating_change`) AS `rating` from (`players` left join `ratingchanges` on((`players`.`id` = `ratingchanges`.`player_id`))) where (`ratingchanges`.`created` >= (curdate() - interval 8 week)) group by `players`.`id` order by `rating` desc ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `current_rating`  AS  select `players`.`id` AS `id`,`players`.`name` AS `name`,sum(`rating_changes`.`rating_change`) AS `rating` from (`players` join `rating_changes` on((`players`.`id` = `rating_changes`.`player_id`))) where (`rating_changes`.`created` >= (curdate() - interval 8 week)) group by `players`.`id` order by `rating` desc ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `current_ratings`
+--
+DROP TABLE IF EXISTS `current_ratings`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `current_ratings`  AS  select `players`.`id` AS `id`,`players`.`name` AS `name`,sum(`rating_changes`.`rating_change`) AS `rating` from (`players` left join `rating_changes` on((`players`.`id` = `rating_changes`.`player_id`))) where (`rating_changes`.`created` >= (curdate() - interval 8 week)) group by `players`.`id` order by `rating` desc ;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `EloChanges`
+-- Indexes for table `elo_changes`
 --
-ALTER TABLE `EloChanges`
+ALTER TABLE `elo_changes`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -296,15 +466,21 @@ ALTER TABLE `Players`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `RatingChanges`
+-- Indexes for table `rating_changes`
 --
-ALTER TABLE `RatingChanges`
+ALTER TABLE `rating_changes`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `Roles`
 --
 ALTER TABLE `Roles`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tables`
+--
+ALTER TABLE `tables`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -330,10 +506,10 @@ ALTER TABLE `Users`
 --
 
 --
--- AUTO_INCREMENT for table `EloChanges`
+-- AUTO_INCREMENT for table `elo_changes`
 --
-ALTER TABLE `EloChanges`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `elo_changes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `Groups`
@@ -345,13 +521,13 @@ ALTER TABLE `Groups`
 -- AUTO_INCREMENT for table `Matches`
 --
 ALTER TABLE `Matches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Matchtypes`
 --
 ALTER TABLE `Matchtypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `Memberships`
@@ -366,9 +542,9 @@ ALTER TABLE `Players`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `RatingChanges`
+-- AUTO_INCREMENT for table `rating_changes`
 --
-ALTER TABLE `RatingChanges`
+ALTER TABLE `rating_changes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
@@ -378,10 +554,16 @@ ALTER TABLE `Roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `tables`
+--
+ALTER TABLE `tables`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `Teams`
 --
 ALTER TABLE `Teams`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `Tournaments`
