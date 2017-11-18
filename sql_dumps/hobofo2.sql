@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 07, 2017 at 10:07 AM
+-- Generation Time: Nov 18, 2017 at 11:14 AM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.30
 
@@ -218,7 +218,30 @@ CREATE TABLE `Matches` (
 --
 
 INSERT INTO `Matches` (`id`, `tournament_id`, `group_id`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `winner_id`, `matchtype_id`, `table_id`, `created`, `started`, `ended`) VALUES
-(1, 1, 1, 1, 2, 2, 7, 2, 1, 1, '2017-11-05 23:47:39', '2017-11-05 00:00:00', '2017-11-05 07:00:00');
+(1, 1, 1, 1, 2, 2, 7, 1, 1, 1, '2017-11-05 23:47:39', '2017-11-05 00:00:00', '2017-11-05 07:00:00');
+
+--
+-- Triggers `Matches`
+--
+DELIMITER $$
+CREATE TRIGGER `winner_changed_update_elo` AFTER UPDATE ON `Matches` FOR EACH ROW BEGIN
+DECLARE formerChanges INT;
+
+IF OLD.winner_id != NEW.winner_id THEN 
+	SELECT COUNT(*)
+    FROM elo_changes
+    WHERE NEW.id = elo_changes.match_id
+    INTO formerChanges;
+    
+    IF formerChanges > 0 THEN
+		INSERT INTO Users (name, password, role_id) VALUES (1, 1, 1);
+	END IF;
+    
+END IF;
+
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -407,6 +430,13 @@ CREATE TABLE `Users` (
   `role_id` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `Users`
+--
+
+INSERT INTO `Users` (`id`, `name`, `password`, `role_id`) VALUES
+(1, '1', '1', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -575,7 +605,7 @@ ALTER TABLE `Tournaments`
 -- AUTO_INCREMENT for table `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
