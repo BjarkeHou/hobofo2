@@ -54,19 +54,28 @@ class MatchesTable extends Table
             'foreignKey' => 'group_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('Team1s', [
+        $this->belongsTo('Team1', [
+            'className' => 'Teams',
             'foreignKey' => 'team1_id',
-            'joinType' => 'INNER'
+            'joinType' => 'INNER',
+            //'propertyName' => 'Team1'
         ]);
-        $this->belongsTo('Team2s', [
+        $this->belongsTo('Team2', [
+            'className' => 'Teams',
             'foreignKey' => 'team2_id',
-            'joinType' => 'INNER'
+            'joinType' => 'INNER',
+            // 'propertyName' => 'Team2'
         ]);
-        $this->belongsTo('Winners', [
+        $this->belongsTo('Winner', [
+            'className' => 'Teams',
             'foreignKey' => 'winner_id'
         ]);
         $this->belongsTo('Matchtypes', [
             'foreignKey' => 'matchtype_id',
+            'joinType' => 'INNER'
+        ]);
+        $this->belongsTo('Tables', [
+            'foreignKey' => 'table_id',
             'joinType' => 'INNER'
         ]);
         $this->hasMany('EloChanges', [

@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 /**
  * CakePHP(tm) : Rapid Development Framework (https://cakephp.org)
  * Copyright (c) Cake Software Foundation, Inc. (https://cakefoundation.org)
@@ -53,5 +53,25 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     </div>
     <footer>
     </footer>
+</body>
+</html>
+ -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?= $this->element('head') ?>
+</head>
+<body>
+    <?= $this->element('header') ?>
+    <!-- Page Content -->
+    <div id="content" class="container">
+        <?= $this->Flash->render() ?>
+        <div class="row">
+            <?= $this->fetch('content') ?>
+        </div>
+    </div>
+    <?= $this->element('footer') ?>
 </body>
 </html>

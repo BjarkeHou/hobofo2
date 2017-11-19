@@ -22,7 +22,7 @@
     </ul>
 </nav>
 <div class="matches view large-9 medium-8 columns content">
-    <h3><?= h($match->id) ?></h3>
+    <h3><?= h($match->team1->player1->name." og ".$match->team1->player2->name." vs ".$match->team2->player1->name." og ".$match->team2->player2->name) ?></h3>
     <table class="vertical-table">
         <tr>
             <th scope="row"><?= __('Tournament') ?></th>

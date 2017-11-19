@@ -21,7 +21,7 @@ class MatchesController extends AppController
     public function index()
     {
         $this->paginate = [
-            'contain' => ['Tournaments', 'Groups', 'Team1s', 'Team2s', 'Winners', 'Matchtypes']
+            'contain' => ['Tournaments', 'Groups', 'Team1', 'Team2', 'Winner', 'Matchtypes']
         ];
         $matches = $this->paginate($this->Matches);
 
@@ -39,7 +39,7 @@ class MatchesController extends AppController
     public function view($id = null)
     {
         $match = $this->Matches->get($id, [
-            'contain' => ['Tournaments', 'Groups', 'Team1s', 'Team2s', 'Winners', 'Matchtypes', 'EloChanges']
+            'contain' => ['Tournaments', 'Groups', 'Team1', 'Team2', 'Team1.Player1', 'Team1.Player2', 'Team2.Player1', 'Team2.Player2', 'Winner', 'Matchtypes', 'EloChanges']
         ]);
 
         $this->set('match', $match);
@@ -65,11 +65,11 @@ class MatchesController extends AppController
         }
         $tournaments = $this->Matches->Tournaments->find('list', ['limit' => 200]);
         $groups = $this->Matches->Groups->find('list', ['limit' => 200]);
-        $team1s = $this->Matches->Team1s->find('list', ['limit' => 200]);
-        $team2s = $this->Matches->Team2s->find('list', ['limit' => 200]);
-        $winners = $this->Matches->Winners->find('list', ['limit' => 200]);
+        $team1 = $this->Matches->Team1->find('list', ['limit' => 200]);
+        $team2 = $this->Matches->Team2->find('list', ['limit' => 200]);
+        $winner = $this->Matches->Winner->find('list', ['limit' => 200]);
         $matchtypes = $this->Matches->Matchtypes->find('list', ['limit' => 200]);
-        $this->set(compact('match', 'tournaments', 'groups', 'team1s', 'team2s', 'winners', 'matchtypes'));
+        $this->set(compact('match', 'tournaments', 'groups', 'team1', 'team2', 'winner', 'matchtypes'));
         $this->set('_serialize', ['match']);
     }
 
@@ -96,11 +96,11 @@ class MatchesController extends AppController
         }
         $tournaments = $this->Matches->Tournaments->find('list', ['limit' => 200]);
         $groups = $this->Matches->Groups->find('list', ['limit' => 200]);
-        $team1s = $this->Matches->Team1s->find('list', ['limit' => 200]);
-        $team2s = $this->Matches->Team2s->find('list', ['limit' => 200]);
-        $winners = $this->Matches->Winners->find('list', ['limit' => 200]);
+        $team1 = $this->Matches->Team1->find('list', ['limit' => 200]);
+        $team2 = $this->Matches->Team2->find('list', ['limit' => 200]);
+        $winner = $this->Matches->Winner->find('list', ['limit' => 200]);
         $matchtypes = $this->Matches->Matchtypes->find('list', ['limit' => 200]);
-        $this->set(compact('match', 'tournaments', 'groups', 'team1s', 'team2s', 'winners', 'matchtypes'));
+        $this->set(compact('match', 'tournaments', 'groups', 'team1', 'team2', 'winner', 'matchtypes'));
         $this->set('_serialize', ['match']);
     }
 

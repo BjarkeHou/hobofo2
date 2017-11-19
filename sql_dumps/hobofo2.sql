@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 18, 2017 at 11:14 AM
+-- Generation Time: Nov 19, 2017 at 12:59 AM
 -- Server version: 5.7.19
 -- PHP Version: 5.6.30
 
@@ -200,9 +200,9 @@ INSERT INTO `Groups` (`id`, `tournament_id`, `group_number`, `created`) VALUES
 CREATE TABLE `Matches` (
   `id` int(11) NOT NULL,
   `tournament_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  `team1_id` int(11) NOT NULL,
-  `team2_id` int(11) NOT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `team1_id` int(11) DEFAULT NULL,
+  `team2_id` int(11) DEFAULT NULL,
   `team1_score` int(11) DEFAULT NULL,
   `team2_score` int(11) DEFAULT NULL,
   `winner_id` int(11) DEFAULT NULL,
@@ -279,6 +279,32 @@ CREATE TABLE `Memberships` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `Placements`
+--
+
+CREATE TABLE `Placements` (
+  `id` int(11) NOT NULL,
+  `placement` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `Placements`
+--
+
+INSERT INTO `Placements` (`id`, `placement`) VALUES
+(1, 'Vinder'),
+(2, 'Tabt finale'),
+(3, 'Tabt semi-finale'),
+(4, 'Tabt kvart-finale'),
+(5, 'Vinder Jays'),
+(6, 'Tabt Jays finale'),
+(7, 'Tabt Jays semi-finale'),
+(8, 'Tabt Jays kvart-final'),
+(9, 'Gik ikke videre');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Players`
 --
 
@@ -306,7 +332,8 @@ INSERT INTO `Players` (`id`, `name`, `phone`, `created`, `active_membership`, `l
 (5, 'e', '5', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
 (6, 'f', '6', '2017-11-05 15:38:08', 0, NULL, 0, 1200, 1),
 (7, 'g', '7', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1),
-(8, 'h', '8', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1);
+(8, 'h', '8', '2017-11-05 15:38:26', 0, NULL, 0, 1200, 1),
+(9, 'test', '1234', '2017-11-18 12:57:45', 0, NULL, 0, 1200, 1);
 
 -- --------------------------------------------------------
 
@@ -386,6 +413,7 @@ CREATE TABLE `Teams` (
   `group_id` int(11) NOT NULL,
   `player1_id` int(11) NOT NULL,
   `player2_id` int(11) NOT NULL,
+  `placement_id` int(11) DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -393,9 +421,9 @@ CREATE TABLE `Teams` (
 -- Dumping data for table `Teams`
 --
 
-INSERT INTO `Teams` (`id`, `tournament_id`, `group_id`, `player1_id`, `player2_id`, `created`) VALUES
-(1, 1, 1, 1, 2, '2017-11-05 20:52:40'),
-(2, 1, 1, 3, 4, '2017-11-05 20:52:40');
+INSERT INTO `Teams` (`id`, `tournament_id`, `group_id`, `player1_id`, `player2_id`, `placement_id`, `created`) VALUES
+(1, 1, 1, 1, 2, NULL, '2017-11-05 20:52:40'),
+(2, 1, 1, 3, 4, NULL, '2017-11-05 20:52:40');
 
 -- --------------------------------------------------------
 
@@ -490,6 +518,12 @@ ALTER TABLE `Memberships`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `Placements`
+--
+ALTER TABLE `Placements`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `Players`
 --
 ALTER TABLE `Players`
@@ -566,10 +600,16 @@ ALTER TABLE `Memberships`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `Placements`
+--
+ALTER TABLE `Placements`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `Players`
 --
 ALTER TABLE `Players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `rating_changes`

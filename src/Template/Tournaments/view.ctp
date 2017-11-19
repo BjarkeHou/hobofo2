@@ -90,6 +90,7 @@
                 <th scope="col" class="actions"><?= __('Actions') ?></th>
             </tr>
             <?php foreach ($tournament->matches as $matches): ?>
+            <?php echo $this->element('match', ["match" => $matches]); ?>
             <tr>
                 <td><?= h($matches->id) ?></td>
                 <td><?= h($matches->tournament_id) ?></td>

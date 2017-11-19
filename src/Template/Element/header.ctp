@@ -1,21 +1,22 @@
-<!-- Navigation -->
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-light bg-grey navbar-fixed-top">
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">CodexWorld</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li>
-                    <?= $this->Html->link('Posts', '/') ?>
-                </li>
-            </ul>
-        </div>
+        <a class="navbar-brand" href="">
+            <?php echo $this->Html->image('hbf_icon_small_black.png', ['alt' => 'HBF']); ?>
+            Hovedstadens Bordfodbold Forening
+        </a>
+
+        <ul class="nav justify-content-end">
+            <li class="nav-item">
+                <?php echo $this->Html->link('Spillere', ['controller' => 'Players', 'action' => 'index'], ['class' => 'nav-link text-secondary']); ?>
+            </li>
+            <li class="nav-item">
+                <?php echo $this->Html->link('Turneringer', ['controller' => 'Tournaments', 'action' => 'index'], ['class' => 'nav-link text-secondary']); ?>
+            </li>
+            <li class="nav-item">
+                <?php echo $this->Html->link('Indstillinger', ['controller' => 'Settings', 'action' => 'index'], ['class' => 'nav-link disabled text-secondary']); ?>
+            </li>
+        </ul>        
+        
     </div>
 </nav>
+

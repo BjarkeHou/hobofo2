@@ -51,11 +51,13 @@ class TeamsTable extends Table
             'foreignKey' => 'group_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('Player1s', [
+        $this->belongsTo('Player1', [
+            'className' => 'Players',
             'foreignKey' => 'player1_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('Player2s', [
+        $this->belongsTo('Player2', [
+            'className' => 'Players',
             'foreignKey' => 'player2_id',
             'joinType' => 'INNER'
         ]);

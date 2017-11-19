@@ -84,15 +84,15 @@ class PlayersTable extends Table
             ->dateTime('last_paid_membership')
             ->allowEmpty('last_paid_membership');
 
-        $validator
-            ->integer('rating')
-            ->requirePresence('rating', 'create')
-            ->notEmpty('rating');
+        // $validator
+        //     ->integer('rating')
+        //     ->requirePresence('rating', 'create');
+        //     // ->notEmpty('rating');
 
-        $validator
-            ->integer('elo')
-            ->requirePresence('elo', 'create')
-            ->notEmpty('elo');
+        // $validator
+        //     ->integer('elo')
+        //     ->requirePresence('elo', 'create');
+        //     // ->notEmpty('elo');
 
         $validator
             ->boolean('receive_sms')

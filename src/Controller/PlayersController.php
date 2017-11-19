@@ -53,11 +53,14 @@ class PlayersController extends AppController
         $player = $this->Players->newEntity();
         if ($this->request->is('post')) {
             $player = $this->Players->patchEntity($player, $this->request->getData());
+            // debug($this->request);
+            debug($player);
             if ($this->Players->save($player)) {
                 $this->Flash->success(__('The player has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
+            print_r("asd");
             $this->Flash->error(__('The player could not be saved. Please, try again.'));
         }
         $this->set(compact('player'));

@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\ORM\TableRegistry;
 
 /**
  * Tournaments Controller
@@ -13,6 +14,8 @@ use App\Controller\AppController;
 class TournamentsController extends AppController
 {
 
+
+
     /**
      * Index method
      *
@@ -20,6 +23,7 @@ class TournamentsController extends AppController
      */
     public function index()
     {
+        $this->viewBuilder()->layout('frontend');
         $tournaments = $this->paginate($this->Tournaments);
 
         $this->set(compact('tournaments'));
@@ -36,10 +40,15 @@ class TournamentsController extends AppController
     public function view($id = null)
     {
         $tournament = $this->Tournaments->get($id, [
-            'contain' => ['Groups', 'Matches', 'Teams', 'EloChanges', 'RatingChanges']
+            'contain' => ['Groups', 'Matches', 'Matches.Team1', 'Matches.Team2', 'Matches.Team1.Player1', 'Matches.Team1.Player2', 'Matches.Team2.Player1', 'Matches.Team2.Player2', 'Matches.Tables', 'Teams', 'EloChanges', 'RatingChanges']
         ]);
 
+        // $this->Matches = TableRegistry::get('Matches');
+        // $matches = $this->Matches->find('all', ['contain' => ['Team1', 'Team2', 'Team1.Player1', 'Team1.Player2', 'Team2.Player1', 'Team2.Player2']])->where(['Matches.tournament_id =' => $id]);
+        // $matches = $this->Matches->find('all')->where(['Matches.tournament_id =' => $id]);
+
         $this->set('tournament', $tournament);
+        // $this->set('matches', $matches);
         $this->set('_serialize', ['tournament']);
     }
 
