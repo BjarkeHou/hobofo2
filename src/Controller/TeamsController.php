@@ -21,7 +21,7 @@ class TeamsController extends AppController
     public function index()
     {
         $this->paginate = [
-            'contain' => ['Tournaments', 'Groups', 'Player1s', 'Player2s']
+            'contain' => ['Tournaments', 'Groups', 'Player1', 'Player2']
         ];
         $teams = $this->paginate($this->Teams);
 
@@ -59,14 +59,14 @@ class TeamsController extends AppController
             if ($this->Teams->save($team)) {
                 $this->Flash->success(__('The team has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['controller' => 'Tournaments', 'action' => 'edit', $team->tournament_id]);
             }
             $this->Flash->error(__('The team could not be saved. Please, try again.'));
         }
         $tournaments = $this->Teams->Tournaments->find('list', ['limit' => 200]);
         $groups = $this->Teams->Groups->find('list', ['limit' => 200]);
-        $player1s = $this->Teams->Player1s->find('list', ['limit' => 200]);
-        $player2s = $this->Teams->Player2s->find('list', ['limit' => 200]);
+        $player1 = $this->Teams->Player1->find('list', ['limit' => 200]);
+        $player2 = $this->Teams->Player2->find('list', ['limit' => 200]);
         $this->set(compact('team', 'tournaments', 'groups', 'player1s', 'player2s'));
         $this->set('_serialize', ['team']);
     }
@@ -85,6 +85,7 @@ class TeamsController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $team = $this->Teams->patchEntity($team, $this->request->getData());
+            debug($team);
             if ($this->Teams->save($team)) {
                 $this->Flash->success(__('The team has been saved.'));
 

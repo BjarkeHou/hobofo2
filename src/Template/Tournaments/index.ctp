@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Tournament[]|\Cake\Collection\CollectionInterface $tournaments
  */
 ?>
-<!-- <nav class="large-3 medium-4 columns" id="actions-sidebar">
+<nav class="large-3 medium-4 columns" id="actions-sidebar">
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $this->Html->link(__('New Tournament'), ['action' => 'add']) ?></li>
@@ -19,7 +19,7 @@
         <li><?= $this->Html->link(__('List Rating Changes'), ['controller' => 'RatingChanges', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Rating Change'), ['controller' => 'RatingChanges', 'action' => 'add']) ?></li>
     </ul>
-</nav> -->
+</nav>
 <div class="tournaments index large-9 medium-8 columns content">
     <h3><?= __('Tournaments') ?></h3>
     <table cellpadding="0" cellspacing="0">

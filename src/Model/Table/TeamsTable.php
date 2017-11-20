@@ -88,9 +88,8 @@ class TeamsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['tournament_id'], 'Tournaments'));
-        $rules->add($rules->existsIn(['group_id'], 'Groups'));
-        $rules->add($rules->existsIn(['player1_id'], 'Player1s'));
-        $rules->add($rules->existsIn(['player2_id'], 'Player2s'));
+        $rules->add($rules->existsIn(['player1_id'], 'Player1'));
+        $rules->add($rules->existsIn(['player2_id'], 'Player2'));
 
         return $rules;
     }

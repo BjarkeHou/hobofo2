@@ -65,7 +65,7 @@ class TournamentsController extends AppController
             if ($this->Tournaments->save($tournament)) {
                 $this->Flash->success(__('The tournament has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['action' => 'edit', $tournament->id]);
             }
             $this->Flash->error(__('The tournament could not be saved. Please, try again.'));
         }
@@ -83,7 +83,7 @@ class TournamentsController extends AppController
     public function edit($id = null)
     {
         $tournament = $this->Tournaments->get($id, [
-            'contain' => []
+            'contain' => ['Teams', 'Teams.Player1', 'Teams.Player2']
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $tournament = $this->Tournaments->patchEntity($tournament, $this->request->getData());
@@ -94,7 +94,10 @@ class TournamentsController extends AppController
             }
             $this->Flash->error(__('The tournament could not be saved. Please, try again.'));
         }
-        $this->set(compact('tournament'));
+
+        $this->Players = TableRegistry::get('Players');
+        $players = $this->Players->find('all');
+        $this->set(compact('tournament', 'players'));
         $this->set('_serialize', ['tournament']);
     }
 

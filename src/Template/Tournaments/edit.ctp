@@ -27,14 +27,37 @@
     </ul>
 </nav>
 <div class="tournaments form large-9 medium-8 columns content">
-    <?= $this->Form->create($tournament) ?>
+    <!-- <?= $this->Form->create($tournament) ?> -->
     <fieldset>
         <legend><?= __('Edit Tournament') ?></legend>
-        <?php
-            echo $this->Form->control('started', ['empty' => true]);
-            echo $this->Form->control('ended', ['empty' => true]);
-        ?>
+        <?php echo $this->element('addTeam', ["players" => $players, "tournament_id" => $tournament->id]); ?>
     </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
-    <?= $this->Form->end() ?>
+ <!--    <?= $this->Form->button(__('Submit')) ?>
+    <?= $this->Form->end() ?> -->
+    <div class="related">
+        <h4><?= __('Related Teams') ?></h4>
+        <?php if (!empty($tournament->teams)): ?>
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <th scope="col"><?= __('Group') ?></th>
+                <th scope="col"><?= __('Player1') ?></th>
+                <th scope="col"><?= __('Player2') ?></th>
+                <th scope="col" class="actions"><?= __('Actions') ?></th>
+            </tr>
+            <?php foreach ($tournament->teams as $teams): ?>
+            <tr>
+                <td><?= h($teams->group_id) ?></td>
+                <td><?= h($teams->player1->name) ?></td>
+                <td><?= h($teams->player2->name) ?></td>
+                <td class="actions">
+                    <?= $this->Html->link(__('View'), ['controller' => 'Teams', 'action' => 'view', $teams->id]) ?>
+                    <?= $this->Html->link(__('Edit'), ['controller' => 'Teams', 'action' => 'edit', $teams->id]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Teams', 'action' => 'delete', $teams->id], ['confirm' => __('Are you sure you want to delete # {0}?', $teams->id)]) ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <?php endif; ?>
+    </div>
 </div>
+

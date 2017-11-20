@@ -5,7 +5,6 @@
 </head>
 <body>
     <?= $this->element('header') ?>
-    <!-- Page Content -->
     <div id="content" class="container">
         <?= $this->Flash->render() ?>
         <div class="row">

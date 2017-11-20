@@ -24,10 +24,7 @@
     <?= $this->Form->create($tournament) ?>
     <fieldset>
         <legend><?= __('Add Tournament') ?></legend>
-        <?php
-            echo $this->Form->control('started', ['empty' => true]);
-            echo $this->Form->control('ended', ['empty' => true]);
-        ?>
+        Vil du oprette en ny turnering? Du kan bagefter tilføje hold og sætte grupper.
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>
     <?= $this->Form->end() ?>
