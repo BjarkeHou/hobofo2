@@ -5,6 +5,9 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\ORM\Rule\IsUnique;
+use App\Model\Rule\TeamInTournamentRule;
+
 
 /**
  * Teams Model
@@ -42,7 +45,7 @@ class TeamsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
-
+        
         $this->belongsTo('Tournaments', [
             'foreignKey' => 'tournament_id',
             'joinType' => 'INNER'
@@ -90,6 +93,11 @@ class TeamsTable extends Table
         $rules->add($rules->existsIn(['tournament_id'], 'Tournaments'));
         $rules->add($rules->existsIn(['player1_id'], 'Player1'));
         $rules->add($rules->existsIn(['player2_id'], 'Player2'));
+
+        $rules->add(new TeamInTournamentRule(), "TeamInTournament", ['message' => 'En eller flere spillere er allerede tilmeldt turneringen.']);
+
+        // $rules->add($rules->isUnique(['tournament_id', 'player1_id', 'player2_id'], "Holdet er allerede tilmeldt denne turnering"));
+        // $rules->add($rules->isUnique(['tournament_id', 'player2_id', 'player1_id'], "Holdet er allerede tilmeldt denne turnering"));
 
         return $rules;
     }

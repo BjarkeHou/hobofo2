@@ -62,6 +62,7 @@ class TeamsController extends AppController
                 return $this->redirect(['controller' => 'Tournaments', 'action' => 'edit', $team->tournament_id]);
             }
             $this->Flash->error(__('The team could not be saved. Please, try again.'));
+            return $this->redirect(['controller' => 'Tournaments', 'action' => 'edit', $team->tournament_id]);
         }
         $tournaments = $this->Teams->Tournaments->find('list', ['limit' => 200]);
         $groups = $this->Teams->Groups->find('list', ['limit' => 200]);
